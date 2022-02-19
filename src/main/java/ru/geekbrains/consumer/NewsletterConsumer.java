@@ -20,6 +20,11 @@ public class NewsletterConsumer {
 
         channel.exchangeDeclare(EXCHANGER, BuiltinExchangeType.DIRECT);
 
+        DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+            String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+            System.out.println("Received '" + message + "'");
+        };
+
         while (true) {
             Scanner scanner = new Scanner(System.in);
             String command = scanner.nextLine();
@@ -29,11 +34,6 @@ public class NewsletterConsumer {
                 String queueName = channel.queueDeclare().getQueue();
 
                 channel.queueBind(queueName, EXCHANGER, arrayMessage[1]);
-
-                DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-                    String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                    System.out.println("Received '" + message + "'");
-                };
 
                 channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
                 });
